@@ -1,0 +1,13 @@
+Prefecture:
+  東京:
+    PrefId: 44
+    Block:
+      東京:
+        BlockId: 47662
+      八丈島:
+        BlockId: 47678
+  神奈川:
+    PrefId: 46
+    Block:
+      横浜:
+        BlockId: 47670
