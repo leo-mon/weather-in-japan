@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 import os
-from datetime import timedelta, timezone
+from datetime import datetime, timedelta, timezone
 import locale
 from logging import getLogger, StreamHandler, Formatter
 
@@ -57,7 +57,7 @@ def fetch_weather_by_10(prec_no, block_no, year, month, day):
         'sunshine_duration'
     ]
     df.timestamp = f'{year}/{month}/{day} ' + df.timestamp
-    df.timestamp.values[-1] = f'{year}/{month}/{day+1} 00:00'
+    df.timestamp.values[-1] = datetime.strptime(f'{year}{month}{day}','%Y%m%d') + timedelta(days=1)
     df.timestamp = pd.to_datetime(df.timestamp).dt.tz_localize('Asia/Tokyo')
     logger.debug(df)
     return df
@@ -86,7 +86,7 @@ def fetch_hourly_weather(prec_no, block_no, year, month, day):
         'visibility',
     ]
     df.timestamp = f'{year}/{month}/{day} ' + df.timestamp.astype('str') + ':00'
-    df.timestamp.values[-1] = f'{year}/{month}/{day+1} 0:00'
+    df.timestamp.values[-1] = datetime.strptime(f'{year}{month}{day}','%Y%m%d') + timedelta(days=1)
     df.timestamp = pd.to_datetime(df.timestamp).dt.tz_localize('Asia/Tokyo')
     logger.debug(df)
     return df
