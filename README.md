@@ -16,6 +16,10 @@ docker run -it --rm\
   /bin/bash
 
 python -m unittest discover
+python -m unittest tests.test_scraper.TestScraper
 
-python main.py 10min 東京 東京 csv 20181214 20181215
+python src/main.py 10min 東京都 東京 csv 20200310 20200311
+python src/main.py 10min 神奈川県 横浜 csv 20200310 20200311
+python src/main.py 10min all all csv 20200310 20200310
+
 ```

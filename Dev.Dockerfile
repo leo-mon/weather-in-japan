@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.8
 
 # apt
 RUN apt-get update -y && apt-get install -y \
@@ -12,10 +12,12 @@ ENV TZ=Asia/Tokyo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN pip install \
+  beautifulsoup4 \
   html5lib \
   ipython \
   lxml \
   pandas \
-  pyyaml
+  pyyaml \
+  requests
 
 WORKDIR /wij

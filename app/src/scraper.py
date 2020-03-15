@@ -42,7 +42,7 @@ def construct_url(sampling_rate, prec_no, block_no, year, month, day):
 
 def fetch_weather_by_10(prec_no, block_no, year, month, day):
     url = construct_url('10min', prec_no, block_no, year, month, day)
-    df = pd.read_html(url, skiprows=2)[0]
+    df = pd.read_html(url, skiprows=0)[0]
     df.columns = [
         'timestamp',
         'local_atm',
@@ -65,7 +65,7 @@ def fetch_weather_by_10(prec_no, block_no, year, month, day):
 
 def fetch_hourly_weather(prec_no, block_no, year, month, day):
     url = construct_url('hourly', prec_no, block_no, year, month, day)
-    df = pd.read_html(url, skiprows=2)[0]
+    df = pd.read_html(url, skiprows=0)[0]
     df.columns = [
         'timestamp',
         'local_atm',

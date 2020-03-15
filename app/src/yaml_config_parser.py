@@ -49,3 +49,13 @@ def get_area_ids(prefecture, block):
     logger.debug(f'{prefecture}: {prec_no}, {block}: {block_no}')
 
     return str(prec_no), str(block_no)
+
+def get_all_dict():
+    fd = Path(__file__).parent
+    with open(fd / 'config' / 'area-ids.yaml') as f:
+        area_ids_yaml = f.read()
+    try:
+        area_ids = yaml.load(area_ids_yaml)
+        return area_ids
+    except:
+        logger.error('Loading config yaml failed')

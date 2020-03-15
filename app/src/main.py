@@ -10,7 +10,7 @@ from logging import getLogger, StreamHandler, Formatter
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))  # TODO: move to __init__
 from src.scraper import fetch_weather_by_10, fetch_hourly_weather
-from src.yaml_config_parser import get_area_ids
+from src.yaml_config_parser import get_area_ids, get_all_dict
 
 """
 Log setting
@@ -39,30 +39,54 @@ TZ setting
 JST = timezone(timedelta(hours=+9), 'JST')
 
 def main(sampling_rate, prefecture, block, format, start_date, end_date):
-    prec_no, block_no = get_area_ids(prefecture, block)
     start_datetime = datetime.strptime(start_date, '%Y%m%d')
     end_datetime = datetime.strptime(end_date, '%Y%m%d')
-    output_dir = Path(__file__).parent.parent / 'output' / sampling_rate /prec_no / block_no
-    output_dir.mkdir(parents=True, exist_ok=True)
-    i = start_datetime  # Not necessary but for understanding
-    if sampling_rate == '10min':
-        while i <= end_datetime:
-            logger.info(f'Fetching: {i}')
-            df = fetch_weather_by_10(prec_no, block_no, i.year, i.month, i.day)
-            if format == 'csv':
-                filename = f'{i.strftime("%Y%m%d")}.csv'
-                df.to_csv(output_dir/filename, index=False)
-            time.sleep(1)  # Not to heavy load onto the server
-            i += timedelta(days=1)
-    elif sampling_rate == 'hourly':
-        while i <= end_datetime:
-            logger.info(f'Fetching: {i}')
-            df = fetch_hourly_weather(prec_no, block_no, i.year, i.month, i.day)
-            if format == 'csv':
-                filename = f'{i.strftime("%Y%m%d")}.csv'
-                df.to_csv(output_dir/filename, index=False)
-            time.sleep(1)  # Not to heavy load onto the server
-            i += timedelta(days=1)
+    if prefecture != 'all':
+        prec_no, block_no = get_area_ids(prefecture, block)
+        output_dir = Path(__file__).parent.parent / 'output' / sampling_rate / prec_no / block_no
+        output_dir.mkdir(parents=True, exist_ok=True)
+        i = start_datetime  # Not necessary but for understanding
+        if sampling_rate == '10min':
+            while i <= end_datetime:
+                logger.info(f'Fetching: {i}')
+                df = fetch_weather_by_10(prec_no, block_no, i.year, i.month, i.day)
+                if format == 'csv':
+                    filename = f'{i.strftime("%Y%m%d")}.csv'
+                    df.to_csv(output_dir/filename, index=False)
+                    logger.info(f'Saved: {output_dir/filename}')
+                time.sleep(1)  # Not to heavy load onto the server
+                i += timedelta(days=1)
+        elif sampling_rate == 'hourly':
+            while i <= end_datetime:
+                logger.info(f'Fetching: {i}')
+                df = fetch_hourly_weather(prec_no, block_no, i.year, i.month, i.day)
+                if format == 'csv':
+                    filename = f'{i.strftime("%Y%m%d")}.csv'
+                    df.to_csv(output_dir/filename, index=False)
+                    logger.info(f'Saved: {output_dir / filename}')
+                time.sleep(1)  # Not to heavy load onto the server
+                i += timedelta(days=1)
+    else:
+        area_ids = get_all_dict()
+        logger.debug(area_ids)
+        for prec in area_ids['Prefecture'].keys():
+            prec_no = area_ids['Prefecture'][prec]['PrefId']
+            for block in area_ids['Prefecture'][prec]['Block'].keys():
+                block_no = area_ids['Prefecture'][prec]['Block'][block]['BlockId']
+                logger.info(f'Target: {prec}/{block}({prec_no}/{block_no})')
+                output_dir = Path(__file__).parent.parent / 'output' / sampling_rate / prec_no / block_no
+                output_dir.mkdir(parents=True, exist_ok=True)
+                i = start_datetime  # Not necessary but for understanding
+                if sampling_rate == '10min':
+                    while i <= end_datetime:
+                        logger.info(f'Fetching: {i}')
+                        df = fetch_weather_by_10(prec_no, block_no, i.year, i.month, i.day)
+                        if format == 'csv':
+                            filename = f'{i.strftime("%Y%m%d")}.csv'
+                            df.to_csv(output_dir/filename, index=False)
+                            logger.info(f'Saved: {output_dir/filename}')
+                        time.sleep(1)  # Not to heavy load onto the server
+                        i += timedelta(days=1)
 
     return True
 
